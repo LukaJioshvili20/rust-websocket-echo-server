@@ -1,8 +1,8 @@
 use tokio::net::TcpListener;
-use tokio::spawn
+use tokio::spawn;
 use tokio_tungstenite::accept_async;
 use tokio_tungstenite::tungstenite::protocol::Message;
-use futures_util::{StreamExt, SinkExt}; 
+use futures_util::{StreamExt, SinkExt};
 
 #[tokio::main]
 async fn main() -> Result<(), Box<dyn std::error::Error>> {
