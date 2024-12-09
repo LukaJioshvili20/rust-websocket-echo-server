@@ -1,0 +1,9 @@
+[package]
+name = "rust-websocket-echo-server"
+version = "0.1.0"
+edition = "2021"
+
+[dependencies]
+tokio = { version = "1.42.0", features = ["full"] }
+tokio-tungstenite = "0.24.0"
+futures-util = "0.3"
