@@ -14,7 +14,7 @@ A lightweight WebSocket echo server built in **Rust** using **Tokio** and **toki
 
 ## Requirements
 
-- Rust (version `1.65+`)
+- Rust (version `1.70+`)
 - Cargo (Rust's package manager)
 
 Install Rust using [rustup](https://rustup.rs/):
