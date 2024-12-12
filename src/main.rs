@@ -11,7 +11,8 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
     let addr = "0.0.0.0:8765";
 
     let listener = TcpListener::bind(addr).await?;
-    println!("WebSocket server started on ws://{}", addr);
+    println!("WebSocket server started successfully on ws://{}", addr);
+    println!("/echo is ready to be listened to...");
 
     while let Ok((stream, _)) = listener.accept().await {
         spawn(async move {
