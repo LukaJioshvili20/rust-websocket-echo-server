@@ -1,46 +1,24 @@
 # WebSocket Echo Server
 
-A lightweight WebSocket echo server built in **Rust** using **Tokio** and **tokio-tungstenite**. The server listens for WebSocket connections, receives messages from clients, and sends the same messages back as an "echo."
+A lightweight WebSocket echo server built in **Rust** using **Tokio** and **tokio-tungstenite**. This server listens for WebSocket connections, receives messages from clients, and sends the same messages back as an "echo."
+
+---
 
 ## Features
 
-- Supports multiple WebSocket clients concurrently.
-- Automatically echoes back text and binary messages.
-- Built with **Tokio** for asynchronous and efficient I/O.
-- Uses **tokio-tungstenite** for WebSocket support.
-- Beginner-friendly, modular, and clean Rust code.
+- **Concurrent WebSocket Clients**: Supports multiple WebSocket clients simultaneously.
+- **Echo Functionality**: Automatically echoes back text and binary messages.
+- **Asynchronous and Efficient**: Powered by **Tokio** for high performance.
+- **Docker Support**: Easily deployable using Docker for any environment.
+- **Modular and Extensible**: Clean Rust codebase for adding new features.
 
 ---
 
 ## Requirements
 
-- Rust (version `1.70+`)
-- Cargo (Rust's package manager)
-
-Install Rust using [rustup](https://rustup.rs/):
-
-```bash
-curl --proto '=https' --tlsv1.2 -sSf https://sh.rustup.rs | sh
-```
-
----
-
-## Dependencies
-
-This project uses the following Rust crates:
-
-- [`tokio`](https://crates.io/crates/tokio): Asynchronous runtime.
-- [`tokio-tungstenite`](https://crates.io/crates/tokio-tungstenite): WebSocket implementation for Tokio.
-- [`futures-util`](https://crates.io/crates/futures-util): Utilities for working with asynchronous streams.
-
-Dependencies are managed in `Cargo.toml`:
-
-```toml
-[dependencies]
-tokio = { version = "1.42.0", features = ["full"] }
-tokio-tungstenite = "0.24.0"
-futures-util = "0.3"
-```
+- **Rust** (version `1.70+`)
+- **Cargo** (Rust's package manager)
+- **Docker** (for containerized deployment)
 
 ---
 
@@ -61,21 +39,21 @@ futures-util = "0.3"
 
 ---
 
-## Usage
+## Running Locally
 
-1. Run the server:
+1. Start the WebSocket server:
 
    ```bash
    cargo run
    ```
 
-2. The server will start on `ws://127.0.0.1:8765`.
+2. The server will start on `ws://0.0.0.0:8765`.
 
-3. Test the server using a WebSocket client. For example, using [wscat](https://github.com/websockets/wscat):
+3. Test the server using a WebSocket client. For example, with [wscat](https://github.com/websockets/wscat):
 
    ```bash
    npm install -g wscat
-   wscat -c ws://127.0.0.1:8765
+   wscat -c ws://0.0.0.0:8765/echo
    ```
 
 4. Send a message to the server:
@@ -92,9 +70,40 @@ futures-util = "0.3"
 
 ---
 
+## Running with Docker
+
+You can also run the server in a Docker container:
+
+1. Build the Docker image:
+
+   ```bash
+   docker build -t websocket-echo-server .
+   ```
+
+2. Run the container:
+
+   ```bash
+   docker run -p 8765:8765 websocket-echo-server
+   ```
+
+3. The server will be available at `ws://<your-docker-host>:8765`.
+
+---
+
+## Dependencies
+
+This project uses the following Rust crates:
+
+- [`tokio`](https://crates.io/crates/tokio): Asynchronous runtime.
+- [`tokio-tungstenite`](https://crates.io/crates/tokio-tungstenite): WebSocket implementation for Tokio.
+- [`futures-util`](https://crates.io/crates/futures-util): Utilities for working with asynchronous streams.
+- [`tracing`](https://crates.io/crates/tracing): For structured logging.
+
+---
+
 ## Code Structure
 
-- `main.rs`: Contains the main logic for the WebSocket server, including:
+- **`main.rs`**: Contains the main WebSocket server logic, including:
   - Setting up the TCP listener.
   - Accepting WebSocket connections.
   - Echoing messages back to clients.
@@ -103,11 +112,16 @@ futures-util = "0.3"
 
 ## Extending the Server
 
-You can enhance the server further by:
+Enhance the server by:
 
-- **Adding TLS (WSS)**: Use the `tokio-rustls` crate for secure WebSocket connections.
-- **Message Filtering**: Implement custom logic to process messages before echoing them.
-- **Logging**: Integrate structured logging using crates like `log` and `env_logger`.
+1. **Adding New Endpoints**:
+   - Introduce new WebSocket paths like `/chat`.
+2. **TLS (WSS)**:
+   - Use the `tokio-rustls` crate for secure WebSocket connections.
+3. **Structured Logging**:
+   - Already integrated with the `tracing` crate for debugging and monitoring.
+4. **Custom Message Processing**:
+   - Modify the message handling logic to filter, transform, or broadcast messages.
 
 ---
 
@@ -115,21 +129,23 @@ You can enhance the server further by:
 
 When running the server, the output will look like this:
 
-```text
-WebSocket server started on ws://127.0.0.1:8765
-New WebSocket connection established
-Received: "Hello, WebSocket!"
-Connection closed
+```plaintext
+INFO  WebSocket server started successfully on ws://0.0.0.0:8765
+INFO  /echo is ready to be listened to...
+INFO  Incoming connection on path: /echo
+INFO  Echo handler invoked
+INFO  Received: Text("Hello, WebSocket!")
+INFO  Echo connection closed
 ```
-
----
-
-## License
-
-This project is licensed under the [MIT License](LICENSE).
 
 ---
 
 ## Contributions
 
 Contributions are welcome! Feel free to submit issues or pull requests to improve the project.
+
+---
+
+## License
+
+This project is licensed under the [MIT License](LICENSE).
