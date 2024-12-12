@@ -1,12 +1,14 @@
+use futures_util::{SinkExt, StreamExt};
+use http::Request;
 use tokio::net::TcpListener;
 use tokio::spawn;
-use tokio_tungstenite::accept_async;
+use tokio_tungstenite::accept_hdr_async;
+use tokio_tungstenite::tungstenite::handshake::server::Response;
 use tokio_tungstenite::tungstenite::protocol::Message;
-use futures_util::{StreamExt, SinkExt};
 
 #[tokio::main]
 async fn main() -> Result<(), Box<dyn std::error::Error>> {
-    let addr = "127.0.0.1:8765";
+    let addr = "0.0.0.0:8765";
 
     let listener = TcpListener::bind(addr).await?;
     println!("WebSocket server started on ws://{}", addr);
@@ -25,8 +27,31 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
 async fn handle_connection(
     stream: tokio::net::TcpStream,
 ) -> Result<(), Box<dyn std::error::Error + Send + Sync>> {
-    let ws_stream = accept_async(stream).await?;
-    println!("New WebSocket connection established");
+    let mut path = String::new();
+
+    // Upgrade the HTTP connection to a WebSocket connection
+    let ws_stream = accept_hdr_async(stream, |req: &Request<()>, res: Response| {
+        if let Some(uri) = req.uri().path_and_query() {
+            path = uri.to_string(); // Capture the path
+            println!("Incoming connection on path: {}", path);
+        }
+        Ok(res) // Accept the connection
+    })
+    .await?;
+
+    match path.as_str() {
+        "/echo" => handle_echo(ws_stream).await,
+        _ => {
+            eprintln!("Unsupported path: {}", path);
+            Ok(())
+        }
+    }
+}
+
+async fn handle_echo(
+    ws_stream: tokio_tungstenite::WebSocketStream<tokio::net::TcpStream>,
+) -> Result<(), Box<dyn std::error::Error + Send + Sync>> {
+    println!("Echo handler invoked");
 
     let (mut write, mut read) = ws_stream.split();
 
@@ -47,6 +72,6 @@ async fn handle_connection(
         }
     }
 
-    println!("Connection closed");
+    println!("Echo connection closed");
     Ok(())
 }
