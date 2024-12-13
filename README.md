@@ -1,6 +1,6 @@
 # WebSocket Echo Server
 
-A lightweight WebSocket echo server built in **Rust** using **Tokio** and **tokio-tungstenite**. This server listens for WebSocket connections, receives messages from clients, and sends the same messages back as an "echo."
+A lightweight WebSocket echo server built in **Rust** using **Tokio** and **tokio-tungstenite**. This server listens for WebSocket connections, processes messages based on the endpoint, and provides multiple functionalities.
 
 ---
 
@@ -8,6 +8,8 @@ A lightweight WebSocket echo server built in **Rust** using **Tokio** and **toki
 
 - **Concurrent WebSocket Clients**: Supports multiple WebSocket clients simultaneously.
 - **Echo Functionality**: Automatically echoes back text and binary messages.
+- **Mathematical Operations**: Provides an endpoint for solving basic math operations.
+- **Global Chat**: Facilitates a simple chat feature for connected clients.
 - **Asynchronous and Efficient**: Powered by **Tokio** for high performance.
 - **Docker Support**: Easily deployable using Docker for any environment.
 - **Modular and Extensible**: Clean Rust codebase for adding new features.
@@ -53,20 +55,67 @@ A lightweight WebSocket echo server built in **Rust** using **Tokio** and **toki
 
    ```bash
    npm install -g wscat
-   wscat -c ws://0.0.0.0:8765/echo
    ```
 
-4. Send a message to the server:
+4. Connect to different endpoints:
 
-   ```text
-   > Hello, WebSocket!
-   ```
+   ### `/echo`
 
-   The server will echo it back:
+   - Establish a connection:
 
-   ```text
-   < Echo: Hello, WebSocket!
-   ```
+     ```bash
+     wscat -c ws://0.0.0.0:8765/echo
+     ```
+
+   - Send a message:
+
+     ```text
+     > Hello, WebSocket!
+     ```
+
+     The server will echo it back:
+
+     ```text
+     < Echo: Hello, WebSocket!
+     ```
+
+   ### `/math`
+
+   - Perform mathematical operations:
+
+     ```bash
+     wscat -c ws://0.0.0.0:8765/math
+     ```
+
+   - Example interactions:
+
+     ```text
+     > 8 - 2
+     < Result: 6
+     > 10 + 2
+     < Result: 12
+     > 10 * 2
+     < Result: 20
+     > 3!
+     < Result: 6
+     ```
+
+   ### `/global-chat`
+
+   - Engage in a global chat:
+
+     ```bash
+     wscat -c ws://0.0.0.0:8765/global-chat
+     ```
+
+   - Example chat:
+
+     ```text
+     > Hello Somebody
+     < Greeting from somebody
+     > My name is Jeff
+     < My name is John
+     ```
 
 ---
 
@@ -98,6 +147,8 @@ This project uses the following Rust crates:
 - [`tokio-tungstenite`](https://crates.io/crates/tokio-tungstenite): WebSocket implementation for Tokio.
 - [`futures-util`](https://crates.io/crates/futures-util): Utilities for working with asynchronous streams.
 - [`tracing`](https://crates.io/crates/tracing): For structured logging.
+- [`http`](https://crates.io/crates/http): Utilities for working with HTTP requests and responses.
+- [`uuid`](https://crates.io/crates/uuid): For generating and handling UUIDs, especially useful for unique client or session identifiers.
 
 ---
 
@@ -106,7 +157,7 @@ This project uses the following Rust crates:
 - **`main.rs`**: Contains the main WebSocket server logic, including:
   - Setting up the TCP listener.
   - Accepting WebSocket connections.
-  - Echoing messages back to clients.
+  - Handling `/echo`, `/math`, and `/global-chat` endpoints.
 
 ---
 
@@ -114,14 +165,8 @@ This project uses the following Rust crates:
 
 Enhance the server by:
 
-1. **Adding New Endpoints**:
-   - Introduce new WebSocket paths like `/chat`.
-2. **TLS (WSS)**:
-   - Use the `tokio-rustls` crate for secure WebSocket connections.
-3. **Structured Logging**:
-   - Already integrated with the `tracing` crate for debugging and monitoring.
-4. **Custom Message Processing**:
-   - Modify the message handling logic to filter, transform, or broadcast messages.
+1. **Secure Communication**:
+   - Add WSS support with `tokio-rustls`.
 
 ---
 
