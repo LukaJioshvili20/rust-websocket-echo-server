@@ -1,11 +1,14 @@
-use http::Request;
 use tokio::net::TcpListener;
-use tokio::net::TcpStream;
 use tokio::spawn;
 use tokio_tungstenite::accept_hdr_async;
+use tokio_tungstenite::tungstenite::protocol::Message;
 use tracing::{error, info, warn};
 
+use std::sync::{Arc, Mutex};
+
 mod handlers;
+
+type SharedClients = Arc<Mutex<Vec<tokio::sync::mpsc::UnboundedSender<Message>>>>;
 
 #[tokio::main]
 async fn main() -> Result<(), Box<dyn std::error::Error>> {
@@ -15,9 +18,13 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
     let listener = TcpListener::bind(addr).await?;
     info!("WebSocket server started on ws://{}", addr);
 
+    let global_chat_clients = Arc::new(Mutex::new(Vec::new()));
+
     while let Ok((stream, _)) = listener.accept().await {
+        let global_chat_clients = Arc::clone(&global_chat_clients);
+
         spawn(async move {
-            if let Err(err) = handle_connection(stream).await {
+            if let Err(err) = handle_connection(stream, global_chat_clients).await {
                 error!("Error handling connection: {}", err);
             }
         });
@@ -27,11 +34,12 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
 }
 
 async fn handle_connection(
-    stream: TcpStream,
+    stream: tokio::net::TcpStream,
+    global_chat_clients: SharedClients,
 ) -> Result<(), Box<dyn std::error::Error + Send + Sync>> {
     let mut path = String::new();
 
-    let ws_stream = accept_hdr_async(stream, |req: &Request<()>, res| {
+    let ws_stream = accept_hdr_async(stream, |req: &http::Request<()>, res| {
         if let Some(uri) = req.uri().path_and_query() {
             path = uri.to_string();
             info!("Incoming connection on path: {}", path);
@@ -43,6 +51,7 @@ async fn handle_connection(
     match path.as_str() {
         "/echo" => handlers::echo::handle(ws_stream).await,
         "/math" => handlers::math::handle(ws_stream).await,
+        "/global-chat" => handlers::global_chat::handle(ws_stream, global_chat_clients).await,
         _ => {
             warn!("Unsupported path: {}", path);
             Ok(())
