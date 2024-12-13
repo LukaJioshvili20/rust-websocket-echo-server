@@ -1,14 +1,14 @@
+use std::sync::{Arc, Mutex};
 use tokio::net::TcpListener;
+
 use tokio::spawn;
 use tokio_tungstenite::accept_hdr_async;
 use tokio_tungstenite::tungstenite::protocol::Message;
 use tracing::{error, info, warn};
 
-use std::sync::{Arc, Mutex};
-
 mod handlers;
 
-type SharedClients = Arc<Mutex<Vec<tokio::sync::mpsc::UnboundedSender<Message>>>>;
+type SharedClients = Arc<Mutex<Vec<(String, tokio::sync::mpsc::UnboundedSender<Message>)>>>;
 
 #[tokio::main]
 async fn main() -> Result<(), Box<dyn std::error::Error>> {
@@ -18,7 +18,7 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
     let listener = TcpListener::bind(addr).await?;
     info!("WebSocket server started on ws://{}", addr);
 
-    let global_chat_clients = Arc::new(Mutex::new(Vec::new()));
+    let global_chat_clients: SharedClients = Arc::new(Mutex::new(Vec::new()));
 
     while let Ok((stream, _)) = listener.accept().await {
         let global_chat_clients = Arc::clone(&global_chat_clients);
