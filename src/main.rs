@@ -49,7 +49,9 @@ async fn handle_connection(
     .await?;
 
     match path.as_str() {
-        "/echo" => handlers::echo::handle(ws_stream).await,
+        "/echo" => handlers::echo::handle(ws_stream)
+            .await
+            .map_err(|e| Box::new(e) as Box<dyn std::error::Error + Send + Sync>),
         "/math" => handlers::math::handle(ws_stream).await,
         "/global-chat" => handlers::global_chat::handle(ws_stream, global_chat_clients).await,
         _ => {
