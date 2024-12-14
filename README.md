@@ -1,4 +1,4 @@
-# WebSocket Echo Server
+# Rust WebSocket Server
 
 A lightweight WebSocket echo server built in **Rust** using **Tokio** and **tokio-tungstenite**. This server listens for WebSocket connections, processes messages based on the endpoint, and provides multiple functionalities.
 

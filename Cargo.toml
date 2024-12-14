@@ -1,7 +1,12 @@
 [package]
-name = "rust-websocket-echo-server"
+name = "rust-websocket-server"
 version = "0.1.0"
 edition = "2021"
+license = "MIT"
+repository = "https://github.com/LukaJioshvili20/rust-websocket-server"
+keywords = ["rust", "websocket", "server", "ws"]
+categories = ["network-programming", "server"]
+readme = "README.md"
 
 [dependencies]
 tracing-subscriber = { version = "0.3.19", features = ["env-filter"] }
