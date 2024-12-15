@@ -29,8 +29,8 @@ A lightweight WebSocket echo server built in **Rust** using **Tokio** and **toki
 1. Clone the repository:
 
    ```bash
-   git clone https://github.com/LukaJioshvili20/rust-websocket-echo-server.git
-   cd rust-websocket-echo-server
+   git clone https://github.com/LukaJioshvili20/rust-websocket-server.git
+   cd rust-websocket-server
    ```
 
 2. Build the project:
